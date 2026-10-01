@@ -1,29 +1,44 @@
 # Shellforge
 
-A Unix-style shell written in C.
+A Unix-style command-line shell written in C.
 
-## Project Description
-
-Shellforge is a simple Unix-style command-line shell developed in C.
-It provides a basic interface for executing commands and maintaining
-command history.
+Shellforge is a systems programming project that explores how a basic Unix shell works, including command parsing, built-in commands, command execution, and command history.
 
 ## Features
 
-- Execute shell commands
+- Command-line interface
+- External command execution
+- Built-in commands
+- `cd` support
 - Command history
-- Interactive shell prompt
-- Built using C
-- Makefile for compilation
+- GNU Readline support
+- Modular C source structure
+
+## Technologies
+
+- C
+- Linux
+- GCC
+- Make
+- GNU Readline
+- Git
 
 ## Project Structure
 
 ```text
 shellforge/
 ├── include/
-│   └── history.h
+│   └── Header files
 ├── src/
-│   ├── main.c
-│   └── history.c
+│   └── Source files
+├── builtin.c
+├── builtin.h
+├── executor.c
+├── executor.h
+├── expand.c
+├── expand.h
+├── lexer.c
+├── lexer.h
+├── main.c
 ├── makefile
-└── shellforge
+└── README.md
