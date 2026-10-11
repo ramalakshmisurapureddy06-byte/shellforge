@@ -1,7 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -std=c11 -Iinclude
-
-SRC := $(wildcard src/*.c)
+CFLAGS=-Wall -Wextra -std=c11 -Iinclude -I.
+SRC := $(filter-out builtin.current.backup.c,$(wildcard *.c)) src/history.c
 
 TARGET=shellforge
 
@@ -12,4 +11,3 @@ clean:
 	rm -f $(TARGET)
 
 .PHONY: clean
-

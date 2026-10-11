@@ -3,6 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
+#include <time.h>
+#include <sys/utsname.h>
+#define _POSIX_C_SOURCE 200809L
+#include <time.h>
+#include <sys/utsname.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "jobs.h"
 #include "builtin.h"
 #include <signal.h>
@@ -164,36 +174,39 @@ static int builtin_exit(command_t *cmd)
 /* =========================================================
    CHECK WHETHER COMMAND IS A BUILTIN
    ========================================================= */
-
+    
+   
 int is_builtin(const command_t *cmd)
 {
     if (cmd == NULL || cmd->argc == 0)
-    {
         return 0;
-    }
 
     if (strcmp(cmd->argv[0], "cd") == 0)
         return 1;
-
     if (strcmp(cmd->argv[0], "pwd") == 0)
         return 1;
-
     if (strcmp(cmd->argv[0], "echo") == 0)
         return 1;
-
     if (strcmp(cmd->argv[0], "exit") == 0)
         return 1;
-     if (strcmp(cmd->argv[0], "jobs") == 0)
-    return 1;
-
+    if (strcmp(cmd->argv[0], "jobs") == 0)
+        return 1;
     if (strcmp(cmd->argv[0], "fg") == 0)
-    return 1;
-
+        return 1;
     if (strcmp(cmd->argv[0], "bg") == 0)
-    return 1;
-    
-     return 0;
+        return 1;
+    if (strcmp(cmd->argv[0], "mydate") == 0)
+        return 1;
+    if (strcmp(cmd->argv[0], "myuser") == 0)
+        return 1;
+    if (strcmp(cmd->argv[0], "mydir") == 0)
+        return 1;
+    if (strcmp(cmd->argv[0], "mysystem") == 0)
+        return 1;
+
+    return 0;
 }
+
 
 
 /* =========================================================
@@ -203,48 +216,34 @@ int is_builtin(const command_t *cmd)
 int execute_builtin(command_t *cmd)
 {
     if (cmd == NULL || cmd->argc == 0)
-    {
         return -1;
-    }
 
     if (strcmp(cmd->argv[0], "cd") == 0)
-    {
         return builtin_cd(cmd);
-    }
-
     if (strcmp(cmd->argv[0], "pwd") == 0)
-    {
         return builtin_pwd(cmd);
-    }
-
     if (strcmp(cmd->argv[0], "echo") == 0)
-    {
         return builtin_echo(cmd);
-    }
-
     if (strcmp(cmd->argv[0], "exit") == 0)
-    {
         return builtin_exit(cmd);
-    }
-
     if (strcmp(cmd->argv[0], "jobs") == 0)
-{
-    return builtin_jobs(cmd);
-}
-
-if (strcmp(cmd->argv[0], "fg") == 0)
-{
-    return builtin_fg(cmd);
-}
-
-if (strcmp(cmd->argv[0], "bg") == 0)
-{
-    return builtin_bg(cmd);
-}
-
+        return builtin_jobs(cmd);
+    if (strcmp(cmd->argv[0], "fg") == 0)
+        return builtin_fg(cmd);
+    if (strcmp(cmd->argv[0], "bg") == 0)
+        return builtin_bg(cmd);
+    if (strcmp(cmd->argv[0], "mydate") == 0)
+        return builtin_mydate(cmd);
+    if (strcmp(cmd->argv[0], "myuser") == 0)
+        return builtin_myuser(cmd);
+    if (strcmp(cmd->argv[0], "mydir") == 0)
+        return builtin_mydir(cmd);
+    if (strcmp(cmd->argv[0], "mysystem") == 0)
+        return builtin_mysystem(cmd);
 
     return -1;
 }
+
 
 // built in jobs 
 
@@ -411,3 +410,87 @@ int builtin_bg(command_t *cmd)
     return 0;
 }
 
+
+/* Display current date and time */
+int builtin_mydate(command_t *cmd)
+{
+    (void)cmd;
+
+    time_t now = time(NULL);
+    struct tm *local = localtime(&now);
+    char buffer[100];
+
+    if (local == NULL)
+    {
+        perror("mydate");
+        return 1;
+    }
+
+    if (strftime(buffer, sizeof(buffer),
+                 "%a %b %d %H:%M:%S %Y", local) == 0)
+    {
+        fprintf(stderr, "mydate: formatting failed\n");
+        return 1;
+    }
+
+    printf("%s\n", buffer);
+    return 0;
+}
+
+/* Display current username */
+int builtin_myuser(command_t *cmd)
+{
+    (void)cmd;
+
+    const char *user = getenv("USER");
+
+    if (user == NULL)
+        user = getenv("LOGNAME");
+
+    if (user == NULL)
+    {
+        fprintf(stderr, "myuser: username not found\n");
+        return 1;
+    }
+
+    printf("Current user: %s\n", user);
+    return 0;
+}
+
+/* Display current directory */
+int builtin_mydir(command_t *cmd)
+{
+    (void)cmd;
+
+    char directory[4096];
+
+    if (getcwd(directory, sizeof(directory)) == NULL)
+    {
+        perror("mydir");
+        return 1;
+    }
+
+    printf("Current directory: %s\n", directory);
+    return 0;
+}
+
+/* Display operating system information */
+int builtin_mysystem(command_t *cmd)
+{
+    (void)cmd;
+
+    struct utsname info;
+
+    if (uname(&info) == -1)
+    {
+        perror("mysystem");
+        return 1;
+    }
+
+    printf("Operating System: %s\n", info.sysname);
+    printf("Computer Name: %s\n", info.nodename);
+    printf("Kernel Release: %s\n", info.release);
+    printf("Machine Type: %s\n", info.machine);
+
+    return 0;
+}

@@ -16,7 +16,10 @@ int builtin_jobs(command_t *cmd);
 int builtin_fg(command_t *cmd);
 
 int builtin_bg(command_t *cmd);
-
+int builtin_mydate(command_t *cmd);
+int builtin_myuser(command_t *cmd);
+int builtin_mydir(command_t *cmd);
+int builtin_mysystem(command_t *cmd);
 /*
  * Execute a built-in command.
  *
